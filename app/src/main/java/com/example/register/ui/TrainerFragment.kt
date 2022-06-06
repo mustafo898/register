@@ -1,18 +1,24 @@
 package com.example.register.ui
 
+import android.util.Log
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.register.R
 import com.example.register.shared.Shared
 import com.example.register.databinding.FragmentTrainerBinding
 import com.example.register.mvvm.MyViewModel
 import com.example.register.adapter.TrainerAdapter
+import com.example.register.controller.extention
 
 class TrainerFragment: BaseFragment<FragmentTrainerBinding>(FragmentTrainerBinding::inflate) {
-    private val shared by lazy {
+    private lateinit var viewModel: MyViewModel
+
+    private val sharedPref by lazy {
         Shared(requireContext())
     }
-    private lateinit var viewModel:MyViewModel
+
     private val adapter by lazy {
         TrainerAdapter()
     }
@@ -24,12 +30,9 @@ class TrainerFragment: BaseFragment<FragmentTrainerBinding>(FragmentTrainerBindi
 
         viewModel.trainerListViewModel.observe(requireActivity()) {
             adapter.getData(it!!)
-        }
-
-        viewModel.getAllTrainer()
-
-        binding.swipe.setOnRefreshListener {
-            viewModel.getAllTrainer()
+            it.forEach {f->
+                Log.d("ddd", "onViewCreated: $f")
+            }
         }
 
         viewModel.loadingViewModel.observe(requireActivity()) {
@@ -38,6 +41,30 @@ class TrainerFragment: BaseFragment<FragmentTrainerBinding>(FragmentTrainerBindi
 
         viewModel.errorViewModel.observe(requireActivity()) {
             Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+        }
+
+        binding.swipe.setOnRefreshListener {
+            viewModel.getAllTrainer()
+        }
+
+        viewModel.getAllTrainer()
+
+        binding.logOut.setOnClickListener {
+            val popupMenu = PopupMenu(requireContext(),binding.logOut)
+            popupMenu.inflate(R.menu.pop_up_menu)
+            popupMenu.setOnMenuItemClickListener {
+                when(it.itemId){
+                    R.id.log->{
+                        extention.controller?.startMainFragment(RegisterFragment())
+                        sharedPref.setToken("")
+                        return@setOnMenuItemClickListener true
+                    }
+                    else -> {
+                        return@setOnMenuItemClickListener false
+                    }
+                }
+            }
+            popupMenu.show()
         }
     }
 }

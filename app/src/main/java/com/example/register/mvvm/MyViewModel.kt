@@ -24,30 +24,10 @@ class MyViewModel : ViewModel() {
     val errorViewModel: MutableLiveData<String?> get() = _errorViewModel
 
     fun getAllTrainer() {
-        repository.getAllTrainer().observeForever {list->
-            val listTrainer = ArrayList<TrainerResponse>()
-            when (list) {
+        repository.getAllTrainer().observeForever {
+            when (it) {
                 is BaseNetworkResult.Success -> {
-                    _trainerListViewModel.value = listTrainer
-                }
-                is BaseNetworkResult.Error -> {
-                    _errorViewModel.value = list.message
-                }
-                is BaseNetworkResult.Loading -> {
-                    _loadingViewModel.value = list.isLoading
-                }
-            }
-        }
-    }
-
-    private val _logIn = MutableLiveData<LogInResponse>()
-    val logIn: LiveData<LogInResponse> get() = _logIn
-
-    fun logIn(logInRequest: LogInRequest, context: Context){
-        repository.logIn(logInRequest,context).observeForever {
-            when(it){
-                is BaseNetworkResult.Success -> {
-                    _logIn.value = it.data!!
+                    _trainerListViewModel.value = it.data
                 }
                 is BaseNetworkResult.Error -> {
                     _errorViewModel.value = it.message
@@ -59,11 +39,32 @@ class MyViewModel : ViewModel() {
         }
     }
 
-    private val _signUp = MutableLiveData<SignUpResponse>()
-    val signUp: LiveData<SignUpResponse> get() = _signUp
 
-    fun signUp(signUpRequest: SignUpRequest, logInRequest: LogInRequest, context: Context) {
-        repository.singUp(signUpRequest,context,logInRequest).observeForever {
+    private val _logIn = MutableLiveData<LogInResponse>()
+    val logIn: LiveData<LogInResponse> get() = _logIn
+
+    fun logIn(logInRequest: LogInRequest, context: Context){
+        repository.logIn(logInRequest,context).observeForever {
+            when(it){
+                is BaseNetworkResult.Success -> {
+                    _logIn.value = it.data!!
+                    getAllTrainer()
+                }
+                is BaseNetworkResult.Error -> {
+                    _errorViewModel.value = it.message
+                }
+                is BaseNetworkResult.Loading -> {
+                    _loadingViewModel.value = it.isLoading
+                }
+            }
+        }
+    }
+
+    private val _signUp = MutableLiveData<String>()
+    val signUp: LiveData<String> get() = _signUp
+
+    fun signUp(signUpRequest: SignUpRequest) {
+        repository.singUp(signUpRequest).observeForever {
             when(it){
                 is BaseNetworkResult.Success -> {
                     _signUp.value = it.data!!

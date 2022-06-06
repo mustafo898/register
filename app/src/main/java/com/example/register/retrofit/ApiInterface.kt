@@ -27,5 +27,5 @@ interface ApiInterface {
     fun logIn(@Body login: LogInRequest): Call<LogInResponse>
 
     @POST("auth/signup")
-    fun signUp(@Body logup: SignUpRequest): Call<SignUpResponse>
+    fun signUp(@Body logup: SignUpRequest): Call<String>
 }

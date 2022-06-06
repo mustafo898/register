@@ -6,8 +6,16 @@
     android:background="@color/theme_color_8"
     android:layout_height="match_parent">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enter your username and password"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:textStyle="bold"/>
+
     <EditText
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="50dp"
         android:paddingStart="20dp"
         android:paddingEnd="0dp"
         android:id="@+id/name"

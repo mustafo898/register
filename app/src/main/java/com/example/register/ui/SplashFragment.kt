@@ -20,7 +20,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(FragmentSplashBinding
 
     private fun startTimer() {
         Handler().postDelayed({
-            if (shared.getToken() != null) {
+            if (shared.getToken() != "") {
                 extention.controller?.startMainFragment(TrainerFragment())
             } else {
                 extention.controller?.startMainFragment(RegisterFragment())

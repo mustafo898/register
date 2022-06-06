@@ -5,7 +5,6 @@ import android.os.Bundle
 import com.example.register.controller.extention
 import com.example.register.databinding.ActivityMainBinding
 import com.example.register.ui.RegisterFragment
-import com.example.register.ui.SignUpFragment
 import com.example.register.ui.SplashFragment
 
 class MainActivity : AppCompatActivity() {
@@ -16,6 +15,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         extention.init(R.id.controller,supportFragmentManager)
-        extention.controller?.startMainFragment(RegisterFragment())
+        extention.controller?.startMainFragment(SplashFragment())
     }
 }

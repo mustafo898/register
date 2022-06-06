@@ -2,7 +2,6 @@ package com.example.register.ui
 
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
-import com.example.newtrainerapp.retrofit.models.request.LogInRequest
 import com.example.newtrainerapp.retrofit.models.request.SignUpRequest
 import com.example.register.controller.extention
 import com.example.register.shared.Shared
@@ -13,24 +12,37 @@ class RegisterFragment : BaseFragment<FragmentRegisterBinding>(FragmentRegisterB
     private val shared by lazy {
         Shared(requireContext())
     }
-    private lateinit var viewModel:MyViewModel
+    private lateinit var viewModel: MyViewModel
     override fun onViewCreated() {
+        shared.setToken("")
         viewModel = ViewModelProvider(requireActivity())[MyViewModel::class.java]
+        shared.setUserName("")
+        shared.setPassword("")
+
         binding.register.setOnClickListener {
             val username = binding.nickName.text.toString()
             val email = binding.emailAddress.text.toString()
             val name = binding.name.text.toString()
             val password = binding.security.text.toString()
             val role = listOf<String>("ROLE_USER")
-            if (username.trim().isNotEmpty() && email.trim().isNotEmpty() && name.trim().isNotEmpty() && password.trim().isNotEmpty()){
-                viewModel.signUp(SignUpRequest(name,username,email,role,password), LogInRequest(username,password),requireContext())
-                extention.controller?.replaceFragment(TrainerFragment())
-            }else{
+
+            if (username.trim().isNotEmpty() &&
+                email.trim().isNotEmpty() &&
+                name.trim().isNotEmpty() &&
+                password.trim().isNotEmpty()
+            ) {
+                viewModel.signUp(SignUpRequest(name, username, email, role, password))
+                shared.setPassword(password)
+                shared.setUserName(username)
+
+                extention.controller?.replaceFragment(LogInFragment())
+
+            } else {
                 Toast.makeText(requireContext(), "Please fill fields", Toast.LENGTH_SHORT).show()
             }
         }
         binding.logIn.setOnClickListener {
-            extention.controller?.replaceFragment(SignUpFragment())
+            extention.controller?.replaceFragment(LogInFragment())
         }
     }
 }

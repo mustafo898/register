@@ -2,6 +2,7 @@ package com.example.register.repository
 
 import android.content.Context
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.newtrainerapp.retrofit.ApiClient
 import com.example.newtrainerapp.retrofit.ApiInterface
@@ -11,9 +12,7 @@ import com.example.newtrainerapp.retrofit.models.request.SignUpRequest
 import com.example.newtrainerapp.retrofit.models.response.LogInResponse
 import com.example.newtrainerapp.retrofit.models.response.SignUpResponse
 import com.example.newtrainerapp.retrofit.models.response.TrainerResponse
-import com.example.register.controller.extention
 import com.example.register.shared.Shared
-import com.example.register.ui.TrainerFragment
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -21,10 +20,9 @@ import retrofit2.Response
 class Repository {
     private var apiInterface: ApiInterface? = ApiClient.retrofit!!.create(ApiInterface::class.java)
 
-    fun getAllTrainer(): MutableLiveData<BaseNetworkResult<List<TrainerResponse>>> {
+    fun getAllTrainer(): LiveData<BaseNetworkResult<List<TrainerResponse>>> {
         val listViewModel = MutableLiveData<BaseNetworkResult<List<TrainerResponse>>>()
 
-        listViewModel.value = BaseNetworkResult.Loading(true)
         apiInterface?.getTrainersList()?.enqueue(object : Callback<List<TrainerResponse>> {
             override fun onResponse(
                 call: Call<List<TrainerResponse>>,
@@ -40,7 +38,7 @@ class Repository {
 
             override fun onFailure(call: Call<List<TrainerResponse>>, t: Throwable) {
                 listViewModel.value = BaseNetworkResult.Loading(false)
-                listViewModel.value = BaseNetworkResult.Error("No internet connection")
+                listViewModel.value = BaseNetworkResult.Error("${t.message}")
             }
         })
         return listViewModel
@@ -60,36 +58,35 @@ class Repository {
                             sharedPref.setToken(it.accessToken)
                             Log.d("TTTT", "language: ${sharedPref.getToken()}")
                             liveData.value = BaseNetworkResult.Success(it)
+                            liveData.value = BaseNetworkResult.Error("success")
                         }
                     }
                 }
 
                 override fun onFailure(call: Call<LogInResponse>, t: Throwable) {
-
+                    liveData.value = BaseNetworkResult.Error("${t.message}")
                 }
             })
         return liveData
     }
 
-    fun singUp(signUpRequest: SignUpRequest, context: Context, logInRequest: LogInRequest): MutableLiveData<BaseNetworkResult<SignUpResponse>> {
-        val liveData = MutableLiveData<BaseNetworkResult<SignUpResponse>>()
-        val sharedPref = Shared(context)
+    fun singUp(signUpRequest: SignUpRequest): MutableLiveData<BaseNetworkResult<String>> {
+        val liveData = MutableLiveData<BaseNetworkResult<String>>()
 
-        apiInterface?.signUp(signUpRequest)?.enqueue(object : Callback<SignUpResponse>{
+        apiInterface?.signUp(signUpRequest)?.enqueue(object : Callback<String>{
             override fun onResponse(
-                call: Call<SignUpResponse>,
-                response: Response<SignUpResponse>
+                call: Call<String>,
+                response: Response<String>
             ) {
                 if (response.isSuccessful){
                     response.body()?.let {
                         liveData.value = BaseNetworkResult.Success(it)
-                        logIn(logInRequest,context)
                     }
                 }
             }
 
-            override fun onFailure(call: Call<SignUpResponse>, t: Throwable) {
-
+            override fun onFailure(call: Call<String>, t: Throwable) {
+                liveData.value = BaseNetworkResult.Error(t.message)
             }
         })
         return liveData

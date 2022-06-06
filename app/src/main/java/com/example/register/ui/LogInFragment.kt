@@ -9,23 +9,31 @@ import com.example.register.controller.extention
 import com.example.register.databinding.FragmentSignBinding
 import com.example.register.mvvm.MyViewModel
 
-class SignUpFragment : BaseFragment<FragmentSignBinding>(FragmentSignBinding::inflate){
+class LogInFragment : BaseFragment<FragmentSignBinding>(FragmentSignBinding::inflate) {
     private val shared by lazy {
         Shared(requireContext())
     }
 
-    private lateinit var viewModel:MyViewModel
+    private lateinit var viewModel: MyViewModel
 
     override fun onViewCreated() {
+        shared.setToken("")
         viewModel = ViewModelProvider(requireActivity())[MyViewModel::class.java]
+
+        binding.name.setText(shared.getUserName())
+        binding.security.setText(shared.getPassword())
 
         binding.register.setOnClickListener {
             val username = binding.name.text.toString()
             val password = binding.security.text.toString()
-            if (username.trim().isNotEmpty() && password.trim().isNotEmpty()){
+
+            if (username.trim().isNotEmpty() && password.trim().isNotEmpty()) {
                 val request = LogInRequest(username, password)
                 viewModel.logIn(request,requireContext())
-            }else{
+
+                extention.controller?.replaceFragment(TrainerFragment())
+
+            } else {
                 Toast.makeText(requireContext(), "Please fill fields", Toast.LENGTH_SHORT).show()
             }
         }
